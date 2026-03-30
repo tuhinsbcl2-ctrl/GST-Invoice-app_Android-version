@@ -272,7 +272,7 @@ const ChallanModule = (() => {
 
     App.setHeaderActions(`
       <button class="header-btn" onclick="App.navigate('challan-edit', {id:${id}})" title="Edit">✏️</button>
-      <button class="header-btn" onclick="ChallanModule.printChallan(${id})" title="Print">🖨️</button>
+      <button class="header-btn" onclick="PDFExport.exportChallan(${id})" title="Export PDF">📄</button>
       <button class="header-btn" onclick="ChallanModule.deleteChallan(${id})" title="Delete">🗑️</button>
     `);
 
@@ -346,14 +346,14 @@ const ChallanModule = (() => {
     document.getElementById('challan-view-content').innerHTML = `
       ${copiesHtml}
       <div style="display:flex;gap:8px;padding-bottom:8px" class="no-print">
-        <button class="btn btn-primary flex-1" onclick="ChallanModule.printChallan(${id})">🖨️ Print (4 copies)</button>
+        <button class="btn btn-primary flex-1" onclick="PDFExport.exportChallan(${id})">📄 Export PDF (4 copies)</button>
         <button class="btn btn-outline flex-1" onclick="App.navigate('challan-edit', {id:${id}})">✏️ Edit</button>
       </div>
     `;
   }
 
   function printChallan(id) {
-    window.print();
+    PDFExport.exportChallan(id);
   }
 
   async function deleteChallan(id) {
