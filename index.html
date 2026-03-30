@@ -384,6 +384,14 @@
       </div>
       <span style="color:var(--text-muted)">›</span>
     </div>
+    <div class="list-item" onclick="App.navigate('backup')">
+      <div class="list-item-icon blue">☁️</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Backup &amp; Restore</div>
+        <div class="list-item-subtitle">Save data to Google Drive or local ZIP</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
     <div class="list-item" onclick="App.showInstallPrompt()">
       <div class="list-item-icon orange">📲</div>
       <div class="list-item-body">
@@ -391,6 +399,89 @@
         <div class="list-item-subtitle">Add to home screen for offline use</div>
       </div>
       <span style="color:var(--text-muted)">›</span>
+    </div>
+  </div>
+
+  <!-- Backup & Restore Page -->
+  <div class="page" id="page-backup">
+    <div class="section-title">Local Backup</div>
+    <div class="card" style="margin:0 0 12px">
+      <p style="margin:0 0 12px;color:var(--text-secondary);font-size:14px;">
+        Create a ZIP file of all your data and download it to this device.
+        Filename: <code>NibrityGSTBackup_YYYY-MM-DD_HH-mm.zip</code>
+      </p>
+      <button class="btn btn-primary btn-block" onclick="BackupModule.downloadBackupLocally()">
+        💾 Create &amp; Download Backup
+      </button>
+    </div>
+
+    <div class="section-title">Google Drive Backup</div>
+    <div class="card" style="margin:0 0 12px">
+      <p style="margin:0 0 12px;color:var(--text-secondary);font-size:14px;">
+        Sign in with your Google account to upload or download backups from Drive
+        (folder: <code>NibrityGSTBackups</code>).
+      </p>
+      <button id="btn-gdrive-signin" class="btn btn-outline btn-block"
+              onclick="BackupModule.signIn()" style="margin-bottom:8px;">
+        🔑 Sign in with Google
+      </button>
+      <button id="btn-gdrive-signout" class="btn btn-outline btn-block"
+              onclick="BackupModule.signOut()" style="display:none;margin-bottom:8px;">
+        🚪 Sign out from Google
+      </button>
+      <div id="drive-operations" style="display:none">
+        <button class="btn btn-primary btn-block" style="margin-bottom:8px;"
+                onclick="BackupModule.uploadToGoogleDrive()">
+          ☁️ Upload Backup to Google Drive
+        </button>
+        <button class="btn btn-outline btn-block" onclick="BackupModule.loadDriveList()">
+          📋 List Backups in Drive
+        </button>
+        <div id="drive-backup-list" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Restore from Local File</div>
+    <div class="card" style="margin:0 0 12px">
+      <p style="margin:0 0 12px;color:#c62828;font-size:14px;font-weight:500;">
+        ⚠️ Restoring will <strong>replace ALL data</strong> on this phone with the backup contents.
+      </p>
+      <label class="form-label">Select a .zip backup file</label>
+      <input type="file" id="local-restore-file" accept=".zip"
+             class="form-control" style="margin-bottom:8px;"
+             onchange="BackupModule.restoreFromLocalFile(this.files[0])">
+    </div>
+
+    <div class="card" style="background:var(--bg-secondary);padding:12px;margin-bottom:24px;">
+      <div id="backup-status" style="font-size:13px;color:var(--text-secondary);word-break:break-word;">
+        Ready
+      </div>
+    </div>
+  </div>
+
+  <!-- Restore Confirmation Overlay -->
+  <div id="restore-confirm-overlay"
+       style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
+              z-index:9999;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:#fff;border-radius:12px;padding:24px;max-width:340px;width:100%;
+                box-shadow:0 8px 32px rgba(0,0,0,.3);">
+      <h3 style="margin:0 0 12px;color:#c62828;font-size:18px;">⚠️ Confirm Restore</h3>
+      <p style="margin:0 0 20px;color:#333;font-size:15px;line-height:1.5;">
+        This will <strong>overwrite all data on this phone</strong> with the backup contents.
+        This action cannot be undone.
+      </p>
+      <div style="display:flex;gap:12px;">
+        <button id="restore-confirm-no"
+                class="btn btn-outline"
+                style="flex:1;font-weight:600;">
+          Cancel
+        </button>
+        <button id="restore-confirm-yes"
+                class="btn btn-primary"
+                style="flex:1;background:#c62828;border-color:#c62828;font-weight:600;">
+          Yes, Replace All
+        </button>
+      </div>
     </div>
   </div>
 
@@ -696,6 +787,12 @@
 
 <!-- Scripts: Libraries first -->
 <script src="js/lib/dexie.min.js"></script>
+<script src="js/lib/jszip.min.js"></script>
+<!-- Google Identity Services (loaded async; only needed for Drive features).
+     Note: Google rotates this script periodically, so a fixed SRI hash cannot
+     be used. The script is loaded from Google's own origin (accounts.google.com)
+     which is trusted for OAuth purposes. Drive features require internet access. -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <!-- App Scripts -->
 <script src="js/gst-calculator.js"></script>
@@ -709,6 +806,7 @@
 <script src="js/challan.js"></script>
 <script src="js/expense.js"></script>
 <script src="js/reports.js"></script>
+<script src="js/backup.js"></script>
 <script src="js/app.js"></script>
 
 <script>

@@ -130,6 +130,7 @@ const App = (() => {
     'expense-edit': { title: 'Edit Expense', subtitle: '', back: 'expenses', onEnter: (ctx) => ExpenseModule.openForm(ctx.id) },
     'reports': { title: 'Reports', subtitle: 'Business Reports', back: 'more', onEnter: () => ReportsModule.init() },
     'settings': { title: 'Company Settings', subtitle: '', back: 'more', onEnter: () => SettingsModule.load() },
+    'backup': { title: 'Backup & Restore', subtitle: 'Google Drive & Local ZIP', back: 'more', onEnter: () => BackupModule.renderPage() },
   };
 
   // Map page IDs to HTML element IDs
@@ -155,6 +156,7 @@ const App = (() => {
     'expense-edit': 'page-expense-form',
     'reports': 'page-reports',
     'settings': 'page-settings',
+    'backup': 'page-backup',
   };
 
   function navigate(pageId, ctx = {}) {

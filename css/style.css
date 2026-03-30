@@ -565,3 +565,25 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .divider { height: 1px; background: var(--border); margin: 12px 0; }
 .small { font-size: 12px; }
 .hidden { display: none !important; }
+
+/* ── Backup & Restore ────────────────────────────────────────────────────── */
+.backup-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  gap: 12px;
+}
+.backup-file-info { flex: 1; min-width: 0; }
+.backup-file-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.backup-file-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
