@@ -387,7 +387,7 @@ const InvoiceModule = (() => {
 
     App.setHeaderActions(`
       <button class="header-btn" onclick="App.navigate('invoice-edit', {id:${id}})" title="Edit">✏️</button>
-      <button class="header-btn" onclick="InvoiceModule.printInvoice(${id})" title="Print">🖨️</button>
+      <button class="header-btn" onclick="PrintModule.exportInvoicePDF(${id})" title="Export PDF">📄</button>
       <button class="header-btn" onclick="InvoiceModule.deleteInvoice(${id})" title="Delete">🗑️</button>
     `);
 
@@ -523,16 +523,16 @@ const InvoiceModule = (() => {
         <div style="margin-top:32px;border-top:1px solid var(--border);padding-top:6px">Authorised Signatory</div>
       </div>
 
-      <div style="display:flex;gap:8px;padding-bottom:8px" class="no-print">
-        <button class="btn btn-primary flex-1" onclick="InvoiceModule.printInvoice(${id})">🖨️ Print</button>
+      <div style="display:flex;gap:8px;padding-bottom:8px;flex-wrap:wrap" class="no-print">
+        <button class="btn btn-primary flex-1" onclick="PrintModule.exportInvoicePDF(${id})">📄 Export PDF (4 copies)</button>
+        ${inv.challan_no ? `<button class="btn btn-outline flex-1" onclick="PrintModule.exportCombinedPDF(${id})">📋 Combined PDF</button>` : ''}
         <button class="btn btn-outline flex-1" onclick="App.navigate('invoice-edit', {id:${id}})">✏️ Edit</button>
       </div>
     `;
   }
 
   async function printInvoice(id) {
-    // Open print view
-    window.print();
+    PrintModule.exportInvoicePDF(id);
   }
 
   async function deleteInvoice(id) {

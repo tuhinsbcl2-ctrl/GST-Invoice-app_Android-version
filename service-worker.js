@@ -3,7 +3,7 @@
  * Caches all app assets for full offline use
  */
 
-const CACHE_NAME = 'nibrity-gst-v2';
+const CACHE_NAME = 'nibrity-gst-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS = [
   './js/product.js',
   './js/invoice.js',
   './js/challan.js',
+  './js/print.js',
   './js/expense.js',
   './js/reports.js',
   './js/backup.js',

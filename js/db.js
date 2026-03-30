@@ -171,6 +171,13 @@ const DB = (() => {
     return ch;
   }
 
+  async function getChallanByNo(challanNo) {
+    const ch = await db.challans.where('challan_no').equals(challanNo).first();
+    if (!ch) return null;
+    ch.items = await db.challan_items.where('challan_id').equals(ch.id).toArray();
+    return ch;
+  }
+
   async function saveChallan(data, items) {
     return db.transaction('rw', db.challans, db.challan_items, async () => {
       let chId;
@@ -266,7 +273,7 @@ const DB = (() => {
     // Invoices
     getInvoices, getInvoice, saveInvoice, deleteInvoice, getInvoicesByDateRange,
     // Challans
-    getChallans, getChallan, saveChallan, deleteChallan,
+    getChallans, getChallan, getChallanByNo, saveChallan, deleteChallan,
     // Expenses
     getExpenses, getExpense, saveExpense, deleteExpense, getExpensesByDateRange,
     // Invoice Sequences
