@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1a237e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nibrity GST">
+  <meta name="description" content="GST Invoice App for Nibrity Enterprise - Offline Android PWA">
+  <title>Nibrity GST Invoice</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- App Header -->
+<header id="app-header">
+  <button id="back-btn" aria-label="Back">&#8592;</button>
+  <div style="flex:1;min-width:0">
+    <div id="app-title">NIBRITY ENTERPRISE</div>
+    <div class="header-subtitle" id="header-subtitle">GST Invoice</div>
+  </div>
+  <div class="header-actions" id="header-actions"></div>
+</header>
+
+<!-- Page Content -->
+<main id="page-content">
+
+  <!-- Dashboard Page -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card accent">
+        <div class="stat-value" id="stat-invoices">--</div>
+        <div class="stat-label">Total Invoices</div>
+      </div>
+      <div class="stat-card primary">
+        <div class="stat-value" id="stat-challans">--</div>
+        <div class="stat-label">Challans</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-value" id="stat-customers">--</div>
+        <div class="stat-label">Customers</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-value" id="stat-month">--</div>
+        <div class="stat-label">This Month (₹)</div>
+      </div>
+    </div>
+
+    <div class="section-title">Quick Actions</div>
+    <div class="quick-actions">
+      <button class="quick-action-btn" onclick="App.navigate('invoice-new')">
+        <span class="qa-icon">🧾</span>New Invoice
+      </button>
+      <button class="quick-action-btn" onclick="App.navigate('challan-new')">
+        <span class="qa-icon">📦</span>New Challan
+      </button>
+      <button class="quick-action-btn" onclick="App.navigate('customer-new')">
+        <span class="qa-icon">👤</span>Add Customer
+      </button>
+      <button class="quick-action-btn" onclick="App.navigate('expense-new')">
+        <span class="qa-icon">💸</span>Add Expense
+      </button>
+    </div>
+
+    <div class="section-title">Recent Invoices</div>
+    <div id="recent-invoices">
+      <div class="empty-state"><div class="empty-icon">🧾</div><p>No invoices yet</p></div>
+    </div>
+
+    <div class="section-title">Recent Challans</div>
+    <div id="recent-challans">
+      <div class="empty-state"><div class="empty-icon">📦</div><p>No challans yet</p></div>
+    </div>
+  </div>
+
+  <!-- Invoice List Page -->
+  <div class="page" id="page-invoices">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="invoice-search" placeholder="Search invoices..." oninput="InvoiceModule.onSearch(this.value)">
+    </div>
+    <div id="invoice-list"></div>
+  </div>
+
+  <!-- Invoice Form Page -->
+  <div class="page" id="page-invoice-form">
+    <div class="card">
+      <div class="card-title">Invoice Details</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Invoice No</label>
+          <input class="form-control" id="inv-no" readonly placeholder="Auto-generated">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input class="form-control" id="inv-date" type="date" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Challan No</label>
+          <input class="form-control" id="inv-challan-no" placeholder="Optional">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Challan Date</label>
+          <input class="form-control" id="inv-challan-date" type="date">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Buyer Details</div>
+      <div class="form-group">
+        <label class="form-label">Select Customer</label>
+        <div style="display:flex;gap:8px">
+          <select class="form-control flex-1" id="inv-customer-select" onchange="InvoiceModule.onCustomerSelect(this.value)">
+            <option value="">-- Select Customer --</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="App.navigate('customer-new')">+</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Buyer Name *</label>
+        <input class="form-control" id="inv-buyer-name" required placeholder="Company / Person Name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" id="inv-buyer-address" rows="2" placeholder="Full Address"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">GSTIN</label>
+          <input class="form-control" id="inv-buyer-gstin" placeholder="15-char GSTIN" maxlength="15">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <select class="form-control" id="inv-buyer-state" onchange="InvoiceModule.onBuyerStateChange()">
+            <option value="">--Select State--</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Place of Supply</label>
+        <select class="form-control" id="inv-place-supply">
+          <option value="">--Select--</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Transport Details</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Dispatched Through</label>
+          <input class="form-control" id="inv-dispatched-through" placeholder="Courier / Transport">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destination</label>
+          <input class="form-control" id="inv-destination" placeholder="Delivery location">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Buyer Order No</label>
+          <input class="form-control" id="inv-buyer-order-no">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Order Date</label>
+          <input class="form-control" id="inv-buyer-order-date" type="date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Terms of Delivery</label>
+        <input class="form-control" id="inv-terms-delivery" placeholder="e.g. Ex-Works">
+      </div>
+    </div>
+
+    <div class="card" id="invoice-items-card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Items</span>
+        <button class="btn btn-accent btn-sm" onclick="InvoiceModule.addItem()">+ Add Item</button>
+      </div>
+      <div id="invoice-items-container"></div>
+    </div>
+
+    <div class="card" id="invoice-totals-card">
+      <div class="card-title">Totals</div>
+      <div id="inv-gst-type" style="margin-bottom:8px;font-size:13px;color:var(--primary);font-weight:600;"></div>
+      <table class="totals-table">
+        <tr><td class="label">Subtotal</td><td class="value">₹<span id="inv-subtotal">0.00</span></td></tr>
+        <tr id="inv-cgst-row"><td class="label">CGST</td><td class="value">₹<span id="inv-cgst">0.00</span></td></tr>
+        <tr id="inv-sgst-row"><td class="label">SGST</td><td class="value">₹<span id="inv-sgst">0.00</span></td></tr>
+        <tr id="inv-igst-row" class="hidden"><td class="label">IGST</td><td class="value">₹<span id="inv-igst">0.00</span></td></tr>
+        <tr><td class="label">Round Off</td><td class="value">₹<span id="inv-roundoff">0.00</span></td></tr>
+        <tr class="grand-total"><td class="label">Grand Total</td><td class="value">₹<span id="inv-grand-total">0.00</span></td></tr>
+      </table>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-muted)" id="inv-amount-words"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Payment</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Payment Mode</label>
+          <select class="form-control" id="inv-payment-mode">
+            <option value="Bank">Bank</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Status</label>
+          <select class="form-control" id="inv-payment-status">
+            <option value="Unpaid">Unpaid</option>
+            <option value="Paid">Paid</option>
+            <option value="Partial">Partial</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="inv-notes" rows="2" placeholder="Additional notes..."></textarea>
+      </div>
+    </div>
+
+    <div style="padding:0 0 8px;display:flex;gap:10px">
+      <button class="btn btn-primary btn-block flex-1" onclick="InvoiceModule.save()">💾 Save Invoice</button>
+    </div>
+  </div>
+
+  <!-- Invoice View Page -->
+  <div class="page" id="page-invoice-view">
+    <div id="invoice-view-content"></div>
+  </div>
+
+  <!-- Challan List Page -->
+  <div class="page" id="page-challans">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="challan-search" placeholder="Search challans..." oninput="ChallanModule.onSearch(this.value)">
+    </div>
+    <div id="challan-list"></div>
+  </div>
+
+  <!-- Challan Form Page -->
+  <div class="page" id="page-challan-form">
+    <div class="card">
+      <div class="card-title">Challan Details</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Challan No *</label>
+          <input class="form-control" id="ch-no" placeholder="e.g. CH/001/25-26">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input class="form-control" id="ch-date" type="date" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Linked Invoice No</label>
+        <input class="form-control" id="ch-invoice-no" placeholder="Optional invoice reference">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Consignee Details</div>
+      <div class="form-group">
+        <label class="form-label">Select Customer</label>
+        <select class="form-control" id="ch-customer-select" onchange="ChallanModule.onCustomerSelect(this.value)">
+          <option value="">-- Select Customer --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Consignee Name *</label>
+        <input class="form-control" id="ch-consignee-name" required placeholder="Company / Person Name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" id="ch-consignee-address" rows="2" placeholder="Full Address"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">GSTIN</label>
+          <input class="form-control" id="ch-consignee-gstin" maxlength="15">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <select class="form-control" id="ch-consignee-state">
+            <option value="">--Select--</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Transport</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Vehicle No</label>
+          <input class="form-control" id="ch-vehicle-no" placeholder="e.g. WB01AB1234">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dispatched Through</label>
+          <input class="form-control" id="ch-dispatched-through" placeholder="Courier / Transport">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Destination</label>
+        <input class="form-control" id="ch-destination" placeholder="Delivery location">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Items</span>
+        <button class="btn btn-accent btn-sm" onclick="ChallanModule.addItem()">+ Add Item</button>
+      </div>
+      <div id="challan-items-container"></div>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Notes / Remarks</label>
+        <textarea class="form-control" id="ch-notes" rows="2" placeholder="Additional notes..."></textarea>
+      </div>
+    </div>
+
+    <div style="padding:0 0 8px;display:flex;gap:10px">
+      <button class="btn btn-primary btn-block flex-1" onclick="ChallanModule.save()">💾 Save Challan</button>
+    </div>
+  </div>
+
+  <!-- Challan View Page -->
+  <div class="page" id="page-challan-view">
+    <div id="challan-view-content"></div>
+  </div>
+
+  <!-- More Page -->
+  <div class="page" id="page-more">
+    <div class="section-title">Management</div>
+    <div class="list-item" onclick="App.navigate('customers')">
+      <div class="list-item-icon blue">👥</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Customers</div>
+        <div class="list-item-subtitle">Manage customer database</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
+    <div class="list-item" onclick="App.navigate('products')">
+      <div class="list-item-icon orange">📦</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Products / Catalog</div>
+        <div class="list-item-subtitle">Manage product catalog & stock</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
+    <div class="list-item" onclick="App.navigate('expenses')">
+      <div class="list-item-icon red">💸</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Expenses</div>
+        <div class="list-item-subtitle">Track cash & bank expenses</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
+    <div class="section-title">Business</div>
+    <div class="list-item" onclick="App.navigate('reports')">
+      <div class="list-item-icon blue">📊</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Reports</div>
+        <div class="list-item-subtitle">Invoice & expense summaries</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
+    <div class="section-title">Settings</div>
+    <div class="list-item" onclick="App.navigate('settings')">
+      <div class="list-item-icon green">⚙️</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Company Settings</div>
+        <div class="list-item-subtitle">Edit company info & bank details</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
+    <div class="list-item" onclick="App.showInstallPrompt()">
+      <div class="list-item-icon orange">📲</div>
+      <div class="list-item-body">
+        <div class="list-item-title">Install App</div>
+        <div class="list-item-subtitle">Add to home screen for offline use</div>
+      </div>
+      <span style="color:var(--text-muted)">›</span>
+    </div>
+  </div>
+
+  <!-- Customers Page -->
+  <div class="page" id="page-customers">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="customer-search" placeholder="Search customers..." oninput="CustomerModule.onSearch(this.value)">
+    </div>
+    <div id="customer-list"></div>
+  </div>
+
+  <!-- Customer Form Page -->
+  <div class="page" id="page-customer-form">
+    <div class="card">
+      <div class="card-title">Customer Details</div>
+      <input type="hidden" id="cust-id">
+      <div class="form-group">
+        <label class="form-label">Name *</label>
+        <input class="form-control" id="cust-name" required placeholder="Company or Person Name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" id="cust-address" rows="2" placeholder="Full Address"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">GSTIN</label>
+          <input class="form-control" id="cust-gstin" maxlength="15" placeholder="15-char GSTIN">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PAN</label>
+          <input class="form-control" id="cust-pan" maxlength="10" placeholder="PAN">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <select class="form-control" id="cust-state">
+            <option value="">--Select State--</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-control" id="cust-phone" type="tel" placeholder="10-digit mobile">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-control" id="cust-email" type="email" placeholder="email@example.com">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;padding-bottom:8px">
+      <button class="btn btn-primary flex-1" onclick="CustomerModule.save()">💾 Save Customer</button>
+      <button class="btn btn-outline-danger" id="cust-delete-btn" onclick="CustomerModule.delete()" style="display:none">🗑️</button>
+    </div>
+  </div>
+
+  <!-- Products Page -->
+  <div class="page" id="page-products">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="product-search" placeholder="Search products..." oninput="ProductModule.onSearch(this.value)">
+    </div>
+    <div id="product-list"></div>
+  </div>
+
+  <!-- Product Form Page -->
+  <div class="page" id="page-product-form">
+    <div class="card">
+      <div class="card-title">Product Details</div>
+      <input type="hidden" id="prod-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Catalog No</label>
+          <input class="form-control" id="prod-catalog-no" placeholder="e.g. NE-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit</label>
+          <select class="form-control" id="prod-unit">
+            <option value="Nos">Nos</option>
+            <option value="Pcs">Pcs</option>
+            <option value="Kg">Kg</option>
+            <option value="Ltr">Ltr</option>
+            <option value="Mtr">Mtr</option>
+            <option value="Box">Box</option>
+            <option value="Set">Set</option>
+            <option value="Pair">Pair</option>
+            <option value="Dozen">Dozen</option>
+            <option value="Pack">Pack</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Product Name *</label>
+        <input class="form-control" id="prod-name" required placeholder="Full product name">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">HSN Code</label>
+          <input class="form-control" id="prod-hsn" placeholder="4-8 digit HSN">
+        </div>
+        <div class="form-group">
+          <label class="form-label">GST Rate (%)</label>
+          <select class="form-control" id="prod-gst-rate">
+            <option value="0">0%</option>
+            <option value="5">5%</option>
+            <option value="12" selected>12%</option>
+            <option value="18">18%</option>
+            <option value="28">28%</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Default Price (₹)</label>
+          <input class="form-control" id="prod-price" type="number" min="0" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock Qty</label>
+          <input class="form-control" id="prod-stock" type="number" min="0" step="0.001" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Low Stock Threshold</label>
+        <input class="form-control" id="prod-low-stock" type="number" min="0" step="1" placeholder="e.g. 10">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;padding-bottom:8px">
+      <button class="btn btn-primary flex-1" onclick="ProductModule.save()">💾 Save Product</button>
+      <button class="btn btn-outline-danger" id="prod-delete-btn" onclick="ProductModule.delete()" style="display:none">🗑️</button>
+    </div>
+  </div>
+
+  <!-- Expenses Page -->
+  <div class="page" id="page-expenses">
+    <div id="expense-list"></div>
+  </div>
+
+  <!-- Expense Form Page -->
+  <div class="page" id="page-expense-form">
+    <div class="card">
+      <div class="card-title">Expense Details</div>
+      <input type="hidden" id="exp-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input class="form-control" id="exp-date" type="date" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount (₹) *</label>
+          <input class="form-control" id="exp-amount" type="number" min="0" step="0.01" required placeholder="0.00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <input class="form-control" id="exp-description" required placeholder="What was this expense for?">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="exp-category">
+            <option value="General">General</option>
+            <option value="Travel">Travel</option>
+            <option value="Office">Office</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Salaries">Salaries</option>
+            <option value="Raw Material">Raw Material</option>
+            <option value="Transport">Transport</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mode</label>
+          <select class="form-control" id="exp-mode">
+            <option value="Cash">Cash</option>
+            <option value="Bank">Bank</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" id="exp-bank-group">
+        <label class="form-label">Bank Name</label>
+        <input class="form-control" id="exp-bank-name" placeholder="Bank name (if Bank mode)">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;padding-bottom:8px">
+      <button class="btn btn-primary flex-1" onclick="ExpenseModule.save()">💾 Save Expense</button>
+      <button class="btn btn-outline-danger" id="exp-delete-btn" onclick="ExpenseModule.delete()" style="display:none">🗑️</button>
+    </div>
+  </div>
+
+  <!-- Reports Page -->
+  <div class="page" id="page-reports">
+    <div class="card">
+      <div class="card-title">Date Range</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">From</label>
+          <input class="form-control" id="rep-from" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">To</label>
+          <input class="form-control" id="rep-to" type="date">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="ReportsModule.generate()">📊 Generate Report</button>
+    </div>
+    <div id="reports-output"></div>
+  </div>
+
+  <!-- Settings Page -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">Company Information</div>
+      <div class="form-group">
+        <label class="form-label">Company Name *</label>
+        <input class="form-control" id="set-company-name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" id="set-address" rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">GSTIN</label>
+          <input class="form-control" id="set-gstin" maxlength="15">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PAN</label>
+          <input class="form-control" id="set-pan" maxlength="10">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">UDYAM Registration</label>
+        <input class="form-control" id="set-udyam" placeholder="Optional">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <select class="form-control" id="set-state">
+            <option value="">--Select State--</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Invoice Prefix</label>
+          <input class="form-control" id="set-invoice-prefix" maxlength="5" placeholder="e.g. NE">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bank Details</div>
+      <div class="form-group">
+        <label class="form-label">Bank Name</label>
+        <input class="form-control" id="set-bank-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Branch</label>
+        <input class="form-control" id="set-bank-branch">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Account No</label>
+          <input class="form-control" id="set-bank-account">
+        </div>
+        <div class="form-group">
+          <label class="form-label">IFSC Code</label>
+          <input class="form-control" id="set-bank-ifsc">
+        </div>
+      </div>
+    </div>
+
+    <div style="padding-bottom:8px">
+      <button class="btn btn-primary btn-block" onclick="SettingsModule.save()">💾 Save Settings</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- Bottom Navigation -->
+<nav id="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="App.navigate('dashboard')">
+    <span class="nav-icon">🏠</span>Home
+  </button>
+  <button class="nav-item" id="nav-invoices" onclick="App.navigate('invoices')">
+    <span class="nav-icon">🧾</span>Invoices
+  </button>
+  <button class="nav-item" id="nav-challans" onclick="App.navigate('challans')">
+    <span class="nav-icon">📦</span>Challans
+  </button>
+  <button class="nav-item" id="nav-more" onclick="App.navigate('more')">
+    <span class="nav-icon">☰</span>More
+  </button>
+</nav>
+
+<!-- FAB -->
+<button class="fab hidden" id="main-fab" onclick="App.fabAction()">+</button>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Scripts: Libraries first -->
+<script src="js/lib/dexie.min.js"></script>
+
+<!-- App Scripts -->
+<script src="js/gst-calculator.js"></script>
+<script src="js/number-to-words.js"></script>
+<script src="js/db.js"></script>
+<script src="js/invoice-numbering.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/customer.js"></script>
+<script src="js/product.js"></script>
+<script src="js/invoice.js"></script>
+<script src="js/challan.js"></script>
+<script src="js/expense.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
