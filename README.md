@@ -8,6 +8,7 @@ A **fully offline** Progressive Web App (PWA) for **NIBRITY ENTERPRISE** — Tax
 |---|---|
 | **Tax Invoice** | Create/edit/view with auto-sequencing (NE/001/25-26), dynamic items, GST calculation |
 | **Delivery Challan** | 4-copy format (Original, Duplicate, Triplicate, Extra) with lot/mfg/exp dates |
+| **PDF Export** | Export 4-copy Tax Invoice PDF or 4-copy Delivery Challan PDF via Android Chrome print |
 | **GST Calculation** | Auto CGST+SGST (intra-state) or IGST (inter-state) based on state codes |
 | **HSN Breakup** | HSN-wise tax summary table on each invoice |
 | **Amount in Words** | Indian numbering (Crore, Lakh, Thousand) |
@@ -25,6 +26,53 @@ A **fully offline** Progressive Web App (PWA) for **NIBRITY ENTERPRISE** — Tax
 2. Visit the app URL (e.g. your GitHub Pages URL)
 3. Tap the **⋮ (3-dot menu) → "Add to Home screen"** or **"Install app"**
 4. The app icon appears on your home screen and works fully **offline**
+
+## Exporting PDF (Tax Invoice & Delivery Challan)
+
+Both Tax Invoice and Delivery Challan support a **4-copy PDF export** that works fully offline on Android Chrome. Each copy is labeled: **Original / Duplicate / Triplicate / Extra**.
+
+### Export Tax Invoice PDF (4 copies)
+
+1. Open the app → **Invoices** → tap any invoice to open it
+2. Tap **📄 Export PDF (4 copies)** at the bottom (or the 📄 icon in the header)
+3. A new tab opens showing 4 pages of the Tax Invoice (one per copy)
+4. Chrome automatically opens the print dialog
+5. In the print dialog, set **Destination** to **Save as PDF**
+6. Tap **Save** — your PDF is saved with all 4 copies
+
+### Export Delivery Challan PDF (4 copies)
+
+1. Open the app → **Delivery Challans** → tap any challan to open it
+2. Tap **📄 Export PDF (4 copies)** at the bottom (or the 📄 icon in the header)
+3. A new tab opens showing 4 pages of the Delivery Challan (one per copy)
+4. Chrome automatically opens the print dialog
+5. In the print dialog, set **Destination** to **Save as PDF**
+6. Tap **Save** — your PDF is saved with all 4 copies
+
+### PDF contents
+
+**Tax Invoice PDF** includes (per copy):
+- Company name, address, GSTIN, state
+- Buyer name, address, GSTIN, state
+- Invoice No, Date, Place of Supply, Challan No/Date, Dispatched Through, Destination, etc.
+- Items table with GST rate, quantity, unit price, taxable value
+  - Intra-state: CGST + SGST columns
+  - Inter-state: IGST column
+- Totals: taxable value, CGST/SGST or IGST, round-off, grand total
+- Amount in words (Indian system: Crore/Lakh/Thousand)
+- HSN-wise tax breakup table
+- Bank details (if configured in Settings)
+- Signature area
+
+**Delivery Challan PDF** includes (per copy):
+- Company name, address, GSTIN, state
+- Consignee name, address, GSTIN, state
+- Challan No, Date, Invoice No (if linked), Vehicle No, Dispatched Through, Destination
+- Items table with Catalogue No, HSN/SAC, Qty, Unit, Lot No, Mfg Date, Exp Date, Remarks
+- Signature area
+
+> **Note:** Pop-ups must be allowed for the app in Chrome for the print window to open.
+> On Android Chrome: tap the address bar → tap the ⓘ icon → **Permissions** → enable **Pop-ups and redirects**.
 
 ## Backup & Restore with Google Drive
 

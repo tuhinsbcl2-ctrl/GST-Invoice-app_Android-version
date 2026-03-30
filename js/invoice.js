@@ -387,7 +387,7 @@ const InvoiceModule = (() => {
 
     App.setHeaderActions(`
       <button class="header-btn" onclick="App.navigate('invoice-edit', {id:${id}})" title="Edit">✏️</button>
-      <button class="header-btn" onclick="InvoiceModule.printInvoice(${id})" title="Print">🖨️</button>
+      <button class="header-btn" onclick="PDFExport.exportInvoice(${id})" title="Export PDF">📄</button>
       <button class="header-btn" onclick="InvoiceModule.deleteInvoice(${id})" title="Delete">🗑️</button>
     `);
 
@@ -524,15 +524,14 @@ const InvoiceModule = (() => {
       </div>
 
       <div style="display:flex;gap:8px;padding-bottom:8px" class="no-print">
-        <button class="btn btn-primary flex-1" onclick="InvoiceModule.printInvoice(${id})">🖨️ Print</button>
+        <button class="btn btn-primary flex-1" onclick="PDFExport.exportInvoice(${id})">📄 Export PDF (4 copies)</button>
         <button class="btn btn-outline flex-1" onclick="App.navigate('invoice-edit', {id:${id}})">✏️ Edit</button>
       </div>
     `;
   }
 
   async function printInvoice(id) {
-    // Open print view
-    window.print();
+    PDFExport.exportInvoice(id);
   }
 
   async function deleteInvoice(id) {
